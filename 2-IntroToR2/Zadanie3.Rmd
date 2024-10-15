@@ -1,0 +1,26 @@
+---
+title: "Zadanie3"
+author: "Sylwia"
+date: "2024-10-15"
+output: html_document
+---
+
+# ***Wprowadzenie***
+
+Wprowadzenie do pakietu **mthapower**, który służy do wykonywania obliczeń związanych z mtDNA.
+
+Został zainstalowany pakiet mthapower. Aby go wczytać, należy zastosować komendę:
+
+```{r}
+library(mthapower)
+```
+
+Informacje o pakiecie:
+
+```{r}
+?mthapower
+```
+
+# ***Wniosek***
+
+Nie zrozumiałam działania tego pakietu.
