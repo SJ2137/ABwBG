@@ -1,0 +1,125 @@
+```{r}
+install.packages("BiocManager")
+```
+```{r}
+library(BiocManager)
+```
+```{r}
+BiocManager::install("ShortRead", force=TRUE)
+```
+```{r}
+library(ShortRead)
+```
+#Zadanie 1
+
+```{r}
+fq_reads1 <- readFastq("C:/Users/48721/Desktop/everything/ecoli_simulated1_with_adapters.fq")
+fq_reads2 <- readFastq("C:/Users/48721/Desktop/everything/ecoli_simulated2_with_adapters.fq")
+```
+
+```{r}
+trimmed_reads1 <- trimTailw(fq_reads1, k = 2, a = "B", halfwidth = 1)
+trimmed_reads2 <- trimTailw(fq_reads2, k = 2, a = "B", halfwidth = 1)
+```
+
+```{r}
+length(fq_reads1)
+length(trimmed_reads1)
+
+length(fq_reads2)
+length(trimmed_reads2)
+
+sum(width(trimmed_reads1) < width(fq_reads1))
+sum(width(trimmed_reads2) < width(fq_reads2))
+```
+#jaki procent odczytów został zmodyfikowany?
+```{r}
+(1-(length(trimmed_reads1)/length(fq_reads1)))*100
+
+```
+
+#Zadanie 2
+
+```{r}
+filtered_reads1 <- trimmed_reads1[width(trimmed_reads1) >= 50]
+filtered_reads2 <- trimmed_reads2[width(trimmed_reads2) >= 50]
+length(filtered_reads1)
+length(filtered_reads2)
+(1-length(filtered_reads1)/length(trimmed_reads1))*100
+(1-length(filtered_reads2)/length(trimmed_reads2))*100
+```
+
+#Zadanie 3
+
+```{r}
+writeFastq(filtered_reads1, "C:/Users/48721/Desktop/everything/ecoli_simulated1_processed.fq")
+writeFastq(filtered_reads2, "C:/Users/48721/Desktop/everything/ecoli_simulated2_processed.fq")
+```
+
+```{r}
+qa_results1 <- qa("C:/Users/48721/Desktop/everything/ecoli_simulated1_with_adapters.fq", type = "fastq")   
+qa_results1_processed <- qa( "C:/Users/48721/Desktop/everything/ecoli_simulated1_processed.fq", type = "fastq")
+report(qa_results1, dest = "C:/Users/48721/Desktop/everything/QA_report_read1")
+report(qa_results1_processed, dest = "C:/Users/48721/Desktop/everything/QA_report_read1_processed")
+
+qa_results2 <- qa("C:/Users/48721/Desktop/everything/ecoli_simulated2_with_adapters.fq", type = "fastq")   
+qa_results2_processed <- qa("C:/Users/48721/Desktop/everything/ecoli_simulated2_processed.fq", type = "fastq")
+report(qa_results2, dest = "C:/Users/48721/Desktop/everything/QA_report_read2")
+report(qa_results2_processed, dest = "C:/Users/48721/Desktop/everything/QA_report_read2_processed")
+```
+
+#Zadanie 4
+
+```{r}
+# Przed przycinaniem (odczyty forward)
+hist(width(fq_reads1), breaks = 50, main = "Długość odczytów forward przed przycinaniem", xlab = "Długość (bp)")
+   
+# Po przycinaniu (odczyty forward)
+hist(width(filtered_reads1), breaks = 50, main = "Długość odczytów forward po przycinaniu", xlab = "Długość (bp)")
+   
+# Przed przycinaniem (odczyty reverse)
+hist(width(fq_reads2), breaks = 50, main = "Długość odczytów reverse przed przycinaniem", xlab = "Długość (bp)")
+   
+# Po przycinaniu (odczyty forward)
+hist(width(filtered_reads2), breaks = 50, main = "Długość odczytów reverse po przycinaniu", xlab = "Długość (bp)")
+```
+
+#Zadanie 5
+
+```{r}
+library(Biostrings)
+adapter_seq <- DNAString("AGATCGGAAGAGC")
+
+
+# Przycinanie adapterów z odczytów forward:
+trimmed_reads1_adapt <- trimLRPatterns(
+  Lpattern = adapter_seq,
+  subject = filtered_reads1
+)
+
+# Defuniujemy odczyty po przycięciu adapterów:
+filtered_reads1 <- trimmed_reads1_adapt
+
+# Przycinanie adapterów z odczytów reverse:
+trimmed_reads2_adapt <- trimLRPatterns(
+  Lpattern = adapter_seq,
+  subject = filtered_reads2
+)
+
+# Defuniujemy odczyty po przycięciu adapterów:
+filtered_reads2 <- trimmed_reads2_adapt
+
+# Porównaj długości przed i po przycięciu adapterów
+length(filtered_reads1)
+length(trimmed_reads1)
+
+length(filtered_reads2)
+length(trimmed_reads2)
+
+# Sprawdź ile odczytów zostało zmodyfikowanych
+sum(width(filtered_reads1) < width(trimmed_reads1))
+sum(width(filtered_reads2) < width(trimmed_reads2))
+```
+
+
+
