@@ -1,0 +1,119 @@
+# Pobranie pliku FASTQ z sekwencjami E.coli
+
+```{r}
+library(ShortRead)
+```
+
+```{r}
+fq1 <- readFastq("C:/Users/48721/Desktop/everything/studia/magisterka/semestr 2/R/SRR31368982.fastq")
+```
+
+# Analiza jakości odczytów za pomocą ShortRead Quality Assessment
+
+```{r}
+qa_result <- qa(fq1, lane="1")
+report(qa_result, dest="C:/Users/48721/Desktop/everything/studia/magisterka/semestr 2/R")
+```
+
+# Import genomu referencyjnego E.coli
+
+```{r}
+library(Biostrings)
+```
+
+```{r}
+ref_genome <- readDNAStringSet("C:/Users/48721/Desktop/everything/studia/magisterka/semestr 2/R/ecoli_genome.fna.gz")
+```
+
+# Indeksowanie genomu referencyjnego E.coli
+
+```{r}
+BiocManager::install("Rsubread", force=TRUE)
+```
+
+```{r}
+library(Rsubread)
+```
+
+```{r}
+buildindex(basename = "ecoli_index", reference = "C:/Users/48721/Desktop/everything/studia/magisterka/semestr 2/R/ecoli_genome.fna.gz")
+```
+
+# Mapowanie odczytów
+
+```{r}
+align(index = "ecoli_index",
+      readfile1 = "C:/Users/48721/Desktop/everything/studia/magisterka/semestr 2/R/SRR31368982.fastq",
+      input_format = "FASTQ",
+      output_file = "C:/Users/48721/Desktop/everything/studia/magisterka/semestr 2/R/aligned_sample.BAM")
+```
+
+# Statystyki mapowania
+
+Total reads : 1219986\
+Mapped : 713927 (58,5%)\
+Uniquely mapped : 705429\
+Multi-mapping : 8498\
+Unmapped : 506059\
+Indels : 1125
+
+# Wstępna analiza wyników mapowania:
+
+# -procent poprawnie zmapowanych odczytów
+
+```{r}
+(713927/1219986)*100
+```
+
+# -procent niepoprawnie zmapowanych odczytów
+
+```{r}
+(506059/1219986)*100
+```
+
+# Możliwe przyczyny niezmapowania genów - insercje, delecje, polimorfizmy
+
+# Import zmapowanych odczytów
+
+```{r}
+library(GenomicAlignments)
+
+aln <- readGAlignments("C:/Users/48721/Desktop/everything/studia/magisterka/semestr 2/R/aligned_sample.BAM")
+```
+
+# Obliczenie pokrycia genomu
+
+```{r}
+coverage_data <- coverage(aln)
+coverage_data
+```
+
+# Wizualizacja pokrycia
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+# Konwersja pokrycia do data frame
+cov_df <- as.data.frame(coverage_data[[1]])
+cov_df$position <- as.numeric(rownames(cov_df))
+
+# Wykres pokrycia
+ggplot(cov_df[1:25000, ], aes(x = position, y = value)) +
+  geom_line(color = "blue") +
+  labs(title = "Pokrycie genomu E. coli",
+       x = "Pozycja w genomie",
+       y = "Liczba zmapowanych odczytów")
+       
+```
+
+# Analiza pokrycia genomu
+
+Obliczenie pokrycia genomu: suma wszystkich odczytów/długość genomu referencyjnego
+
+```{r}
+mean(cov_df$value)
+```
+
+Istnieje kilka pozycji w genomie, które nie zostały zmapowane, w szczególności w rejonie pomiędzy 15000 a 20000 bp.Być może jest to spowodowane trudnością sekwencjowania tego fragmentu. Największa ilość odczytów w danej pozycji wynosi ponad 75, około 97. Średnia ilość odczytów dla danego fragmentu genomu wynosi 32, co jest standardowym poziomem pokrycia genomu.
