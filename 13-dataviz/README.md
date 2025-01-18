@@ -1,4 +1,4 @@
-# Wykorzystanie wykresów do wizualizacji danych genomowych - podsumowanie:
+# Wykorzystanie wykresów do wizualizacji danych genomowych
 ## 1. Wykresy podstawowe:
 
 ### 1a. **Boxplot** - przedstawianie rozkładu zmiennych oraz identyfikacji potencjalnych odchyleń (tzw. outlierów)
