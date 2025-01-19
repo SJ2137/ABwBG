@@ -1,0 +1,66 @@
+# Załadowanie pakietów
+
+```{r}
+library(ShortRead)
+library(Rqc)
+library(Biostrings)
+```
+
+# Wczytanie danych FASTQ
+
+```{r}
+fq_file <- "C:/Users/everything/studia/magisterka/semestr2/R/QC/SRR31303920.fastq.gz" 
+fq_reads <- readFastq(fq_file)
+```
+
+# Określenie liczy odczytów
+
+```{r}
+length(fq_reads)
+```
+
+# Podgląd kilku pierwszych odczytów
+
+```{r}
+fq_reads[1:5]
+```
+
+# **Generowanie raportu QC:**
+
+## Generowanie obiektu z wynikami kontroli jakości
+
+```{r}
+qa_results <- qa(fq_file, type = "fastq")
+```
+
+## Utworzenie raportu QC
+
+```{r}
+report(qa_results, dest = "C:/Users/48721/Desktop/everything/studia/magisterka/semestr2/R/QC")
+```
+
+Raport QC dostarczył następująych informacji:\
+- uzyskano około 1,8 miliona odczytów\
+- częstotliwość wszystkich nukleotydów jest zbliżona do 0.25, brak niedopasowanych nukleotydów\
+- większość odczytów osiąga wysokie wartości jakości (około 40), co wskazuje na dobrą jakość danych\
+- mała liczba odczytów o niskiej jakości
+
+# Utworzenie raportu Rqc
+
+```{r}
+rqc_results <- rqc(path = "C:/Users/48721/Desktop/everything/studia/magisterka/semestr2/R/QC", pattern = "SRR31303920.fastq.gz", sample = TRUE)
+
+rqcReport(rqc_results, outdir = "Rqc_report")
+```
+
+# Analiza zawartości GC
+
+```{r}
+gc_content <- letterFrequency(sread(fq_reads), letters = "GC", as.prob = TRUE)
+```
+
+# Wyświetlenie histogramu %GC
+
+```{r}
+hist(gc_content, breaks = 50, main = "Zawartość GC w oryginalnych odczytach", xlab = "Procent GC")
+```
