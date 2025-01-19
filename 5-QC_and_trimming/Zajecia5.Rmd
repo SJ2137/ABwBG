@@ -1,0 +1,56 @@
+
+# Instalacja BiocManager
+
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE)) 
+    install.packages("BiocManager")
+```
+
+# Instalacja wymaganych pakietów
+
+```{r}
+BiocManager::install("Rqc")
+BiocManager::install("ShortRead")
+BiocManager::install("Biostrings")
+```
+
+# Załadowanie zainstalowanych pakietów
+
+```{r}
+library(ShortRead)
+library(Rqc)
+library(Biostrings)
+```
+
+# Sprawdzenie wersji zainstalowanych pakietów
+
+```{r}
+packageVersion("ShortRead")
+packageVersion("Rqc")
+packageVersion("Biostrings")
+```
+
+
+# Wczytanie sekwencji z pliku FASTA i wyświetlenie pierwszych kilku sekwencji
+
+```{r}
+dna_seqs <- readDNAStringSet("C:/Users/everything/studia/magisterka/semestr2/R/QC/SRR31238041.fasta.gz")
+
+dna_seqs[1:5]
+```
+
+# Odwrócenie i komplementarność sekwencji
+
+```{r}
+rev_comp_seqs <- reverseComplement(dna_seqs)
+rev_comp_seqs[1:5]
+```
+
+# Obliczanie zawartości GC
+
+```{r}
+gc_content <- letterFrequency(dna_seqs, letters = c("G", "C"), as.prob = TRUE)
+gc_content
+```
+
+
